@@ -10,13 +10,15 @@ PKG_BUILD_FILE_NAME = "OpenToonzBuild.pkg"
 PKG_STUFF_FILE_NAME = "OpenToonzStuff.pkg"
 PKG_FINAL_FILE_NAME = "OpenToonz.pkg"
 XML_PATH = "distribution.xml"
+BUNDLE_NAME = "OpenToonz_1.0.app"
 PKG_VERSION = ARGV.size > 2 ? ARGV[2] : "1.0"
+STUFF_NAME = "stuff"
 
 def build_binary_pkg
   pkg_build_args = 
     [
-     "--root #{ARGV[0]}",
-     "--identifier io.github.opentoonz.stuff ",
+     "--root #{BUNDLE_NAME}",
+     "--identifier io.github.opentoonz.bin ",
      "--install-location /Applications/OpenToonz_1.0.app", # include version?
      "--version #{PKG_VERSION} ",
      PKG_BUILD_FILE_NAME
@@ -27,8 +29,8 @@ end
 def build_stuff_pkg
   pkg_build_args = 
     [
-     "--root #{ARGV[1]}",
-     "--identifier io.github.opentoonz.bin ",
+     "--root #{STUFF_NAME}",
+     "--identifier io.github.opentoonz.stuff ",
      "--install-location /Applications/OpenToonz/OpenToonz_1.0_stuff", # include version?
      "--version #{PKG_VERSION} ",
      PKG_STUFF_FILE_NAME
@@ -38,6 +40,17 @@ end
 
 # 0. 
 `rm *.pkg *.xml`
+
+# remove previous bundles
+`rm -rf *.app`
+
+# create bundle dylib pacakged
+`cp -r #{ARGV[0]} .`
+`~/Qt/5.5/clang_64/bin/macdeployqt #{BUNDLE_NAME}`
+
+# create 777 stuff dir
+`cp -r #{ARGV[1]} .`
+`chmod 777 #{STUFF_NAME}`
 
 # 1. 
 build_binary_pkg
