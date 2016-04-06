@@ -1,16 +1,24 @@
-# MAC 用 Installer 作成スクリプト
+# MacOSX 用 Installer (pkg) 作成スクリプト
 
 ## 依存パッケージ・モジュール
 
 - Xcode (`pkgbuild, productbuild`)
 - gsed
 
-## 実行コマンド
+## スクリプト実行
 
-`./app.rb [BUNDLE_PATH] [STUFF_DIR] [VERSION(optional, floatnum)]`
+`./app.rb [BUNDLE_PATH] [STUFF_DIR] [VERSION(floatnum)]`
 
-Pass Bundle path and Version.
+上記のように実行時引数で
 
-実際の例
+- ビルド済バンドルへのパス
+- 本体リポジトリの stuff ディレクトリへのパス
+- pkg のバージョン
 
-`$ ./app.rb ~/public-projects/opentoonz/toonz/build/toonz/OpenToonz_1.0.app ~/public-projects/opentoonz/stuff 1.0.2`
+を与えて下さい。スクリプト内の途中で外部コマンドの実行に失敗すると途中で止まります。
+
+実際の実行例
+
+```
+$ ./app.rb ~/public-projects/opentoonz/toonz/build/toonz/OpenToonz_1.0.app ~/public-projects/opentoonz/stuff 1.0.2
+```
