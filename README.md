@@ -1,16 +1,16 @@
-# recipe
+# MAC 用 Installer 作成スクリプト
 
-## requirements
+## 依存パッケージ・モジュール
 
-- Put a *correct/right/legal* `License.rtf` file.
+- Xcode (`pkgbuild, productbuild`)
+- gsed
 
-## follow commands
+## 実行コマンド
 
 `./app.rb [BUNDLE_PATH] [STUFF_DIR] [VERSION(optional, floatnum)]`
 
-Pass Bundle path and Version. 
+Pass Bundle path and Version.
 
-Example.
+実際の例
 
-`$ ./app.rb ~/projects/OpenToonz/toonz/build/toonz/OpenToonz_1.0.app ~/projects/OpenToonz/stuff/`
-
+`$ ./app.rb ~/public-projects/opentoonz/toonz/build/toonz/OpenToonz_1.0.app ~/public-projects/opentoonz/stuff 1.0.2`

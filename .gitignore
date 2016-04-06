@@ -1,0 +1,6 @@
+VirtualRoot
+.DS_Store
+*.pkg
+*.plist
+*.xml
+*.tar.bz2

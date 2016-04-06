@@ -1,73 +1,81 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
-if ARGV.size < 2 then
-  puts "usage: ./app.rb [TARGET_BUNDLE] [STUFF_DIR] [VERSION(float)]"
+if ARGV.size != 3 then
+  puts "usage: ./app.rb [SRC_BUNDLE_PATH] [STUFF_DIR] [VERSION(float)]"
   exit 1
 end
 
-PKG_BUILD_FILE_NAME = "OpenToonzBuild.pkg"
-PKG_STUFF_FILE_NAME = "OpenToonzStuff.pkg"
-PKG_FINAL_FILE_NAME = "OpenToonz.pkg"
-XML_PATH = "distribution.xml"
-BUNDLE_NAME = "OpenToonz_1.0.app"
-PKG_VERSION = ARGV.size > 2 ? ARGV[2] : "1.0"
-STUFF_NAME = "stuff"
-
-def build_binary_pkg
-  pkg_build_args = 
-    [
-     "--root #{BUNDLE_NAME}",
-     "--identifier io.github.opentoonz.bin ",
-     "--install-location /Applications/OpenToonz_1.0.app", # include version?
-     "--version #{PKG_VERSION} ",
-     PKG_BUILD_FILE_NAME
-    ]
-  `pkgbuild #{pkg_build_args.join(" ")}`
+def exec_with_assert(cmd)
+    result = `#{cmd}`
+    if $? != 0 then
+        puts "Execution '#{cmd}' failed."
+        exit 1
+    end
+    puts "Execution '#{cmd}' succeed."
 end
 
-def build_stuff_pkg
-  pkg_build_args = 
-    [
-     "--root #{STUFF_NAME}",
-     "--identifier io.github.opentoonz.stuff ",
-     "--install-location /Applications/OpenToonz/OpenToonz_1.0_stuff", # include version?
-     "--version #{PKG_VERSION} ",
-     PKG_STUFF_FILE_NAME
-    ]
-  `pkgbuild #{pkg_build_args.join(" ")}`
+# 定数群
+SRC_BUNDLE_PATH = ARGV[0][-1] == "/" ? ARGV[0][0, ARGV[0].size-1] : ARGV[0]
+VERSION = ARGV[2]
+VIRTUAL_ROOT = "VirtualRoot"
+INSTALL_BUNDLE = "OpenToonz_1.0.app"
+APP = "Applications"
+
+PKG_ID = "io.github.opentoonz"
+PKG_TMP = "OpenToonzBuild.pkg"
+FINAL_PKG = "OpenToonz.pkg"
+
+# カレントへバンドルをコピー
+exec_with_assert "cp -r #{SRC_BUNDLE_PATH} #{INSTALL_BUNDLE}"
+# deployqt を適用
+exec_with_assert "~/Qt/5.5/clang_64/bin/macdeployqt #{INSTALL_BUNDLE}"
+
+# VirtualRoot への設置
+# 既存を削除して設置
+if File.exist? VIRTUAL_ROOT then
+    exec_with_assert "rm -rf #{VIRTUAL_ROOT}"
+end
+exec_with_assert "mkdir -p #{VIRTUAL_ROOT}/#{APP}"
+exec_with_assert "mv #{INSTALL_BUNDLE} #{VIRTUAL_ROOT}/#{APP}"
+
+# LC_RPATH から自分の名前を削除
+# 削除する RPATH を指定
+DELETE_RPATH = "/Users/tetsuya_miyashita/Qt/5.5/clang_64/lib"
+DELETE_RPATH_TARGET = "#{VIRTUAL_ROOT}/#{APP}/#{INSTALL_BUNDLE}/Contents/MacOS/OpenToonz_1.0"
+#exec_with_assert "install_name_tool -delete_rpath #{DELETE_RPATH} #{DELETE_RPATH_TARGET}"
+
+# plist が存在しない場合は生成し、必要な変更を適用
+PKG_PLIST = "app.plist"
+unless File.exist? PKG_PLIST then
+    exec_with_assert "pkgbuild --root #{VIRTUAL_ROOT} --analyze #{PKG_PLIST}"
+    exec_with_assert "gsed -i -e \"14i <key>BundlePostInstallScriptPath</key>\" #{PKG_PLIST}"
+    exec_with_assert "gsed -i -e \"15i <string>pkg-script.sh</string>\" #{PKG_PLIST}"
 end
 
-# 0. 
-`rm *.pkg *.xml`
+# stuff の準備
+# 既存のものを削除し tar で固めて scripts に設置
+if File.exist? "scripts/stuff.tar.bz2" then
+    exec_with_assert "rm scripts/*.tar.bz2"
+end
+exec_with_assert "cp -r #{ARGV[1]} stuff"
+exec_with_assert "tar cjvf stuff.tar.bz2 stuff"
+exec_with_assert "mv stuff.tar.bz2 scripts"
 
-# remove previous bundles
-`rm -rf *.app`
+# plist を用いた pkg の生成
+exec_with_assert "pkgbuild --root #{VIRTUAL_ROOT} --component-plist #{PKG_PLIST} --scripts scripts --identifier #{PKG_ID} --version #{VERSION} #{PKG_TMP}"
 
-# create bundle dylib pacakged
-`cp -r #{ARGV[0]} .`
-`~/Qt/5.5/clang_64/bin/macdeployqt #{BUNDLE_NAME}`
+# distribution.xml が存在しない場合は生成
+DIST_XML = "distribution.xml"
+unless File.exists? DIST_XML then
+    exec_with_assert "productbuild --synthesize --package #{PKG_TMP} #{DIST_XML}"
+    exec_with_assert "gsed -i -e \"3i <title>OpenToonz</title>\" #{DIST_XML}"
+    exec_with_assert "gsed -i -e \"6i <license file='License.rtf'></license>\" #{DIST_XML}"
+end
 
-# create 777 stuff dir
-`cp -r #{ARGV[1]} .`
-`chmod 777 #{STUFF_NAME}`
+# 最終的な pkg を生成
+exec_with_assert "productbuild --distribution #{DIST_XML} --package-path #{PKG_TMP} --resources . #{FINAL_PKG}"
 
-# 1. 
-build_binary_pkg
-build_stuff_pkg
-
-# 2.
-# create distribution.xml
-`productbuild --synthesize --package #{PKG_STUFF_FILE_NAME} --package #{PKG_BUILD_FILE_NAME} #{XML_PATH}`
-
-# 3.
-# modify xml
-`gsed -i -e "3i     <title>OpenToonz</title>" #{XML_PATH}`
-`gsed -i -e '6i     <license file="License.rtf"></license>' #{XML_PATH}`
-
-# 4.
-`productbuild --distribution #{XML_PATH} --package-path #{PKG_BUILD_FILE_NAME} --package-path #{PKG_STUFF_FILE_NAME} --resources . #{PKG_FINAL_FILE_NAME}`
-
-# 5.
-`rm #{PKG_BUILD_FILE_NAME} #{PKG_STUFF_FILE_NAME} #{XML_PATH}`
-
+# 一時的な生成物を削除
+`rm #{PKG_TMP}`
+`rm -rf stuff`
