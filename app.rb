@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
-if ARGV.size != 3 then
-  puts "usage: ./app.rb [SRC_BUNDLE_PATH] [STUFF_DIR] [VERSION(float)]"
+if ARGV.size != 5 then
+  puts "usage: ./app.rb [SRC_BUNDLE_PATH] [STUFF_DIR] [VERSION(float)] [MACDEPLOYQT_PATH] [DELETE_RPATH]"
   exit 1
 end
 
@@ -18,6 +18,8 @@ end
 # 定数群
 SRC_BUNDLE_PATH = ARGV[0][-1] == "/" ? ARGV[0][0, ARGV[0].size-1] : ARGV[0]
 VERSION = ARGV[2]
+MACDEPLOYQT_PATH = ARGV[3]
+DELETE_RPATH = ARGV[4]
 VIRTUAL_ROOT = "VirtualRoot"
 INSTALL_BUNDLE = "OpenToonz_1.0.app"
 APP = "Applications"
@@ -29,7 +31,7 @@ FINAL_PKG = "OpenToonz.pkg"
 # カレントへバンドルをコピー
 exec_with_assert "cp -r #{SRC_BUNDLE_PATH} #{INSTALL_BUNDLE}"
 # deployqt を適用
-exec_with_assert "~/Qt/5.5/clang_64/bin/macdeployqt #{INSTALL_BUNDLE}"
+exec_with_assert "#{MACDEPLOYQT_PATH} #{INSTALL_BUNDLE}"
 
 # VirtualRoot への設置
 # 既存を削除して設置
@@ -41,9 +43,8 @@ exec_with_assert "mv #{INSTALL_BUNDLE} #{VIRTUAL_ROOT}/#{APP}"
 
 # LC_RPATH から自分の名前を削除
 # 削除する RPATH を指定
-DELETE_RPATH = "/Users/tetsuya_miyashita/Qt/5.5/clang_64/lib"
 DELETE_RPATH_TARGET = "#{VIRTUAL_ROOT}/#{APP}/#{INSTALL_BUNDLE}/Contents/MacOS/OpenToonz_1.0"
-#exec_with_assert "install_name_tool -delete_rpath #{DELETE_RPATH} #{DELETE_RPATH_TARGET}"
+exec_with_assert "install_name_tool -delete_rpath #{DELETE_RPATH} #{DELETE_RPATH_TARGET}"
 
 # plist が存在しない場合は生成し、必要な変更を適用
 PKG_PLIST = "app.plist"
@@ -79,3 +80,4 @@ exec_with_assert "productbuild --distribution #{DIST_XML} --package-path #{PKG_T
 # 一時的な生成物を削除
 `rm #{PKG_TMP}`
 `rm -rf stuff`
+`rm app.plist`
