@@ -25,3 +25,20 @@
 ```
 ./app.rb ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.0.app ~/Workspaces/github/kogaki/toonz/opentoonz/stuff 0.0.1 ~/Qt5.5.1/5.5/clang_64/bin/macdeployqt ~/Qt5.5.1/5.5/clang_64/lib
 ```
+
+### rpath の確認
+
+```
+otool -l ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.0.app/Contents/MacOS/OpenToonz_1.0
+```
+
+すると、
+
+```
+Load command 43
+          cmd LC_RPATH
+      cmdsize 56
+         path /Users/keisuke_ogaki/Qt/5.5/clang_64/lib/ (offset 12)
+```
+
+のように表示されるので、ユーザーに依存してる部分を消しましょう
