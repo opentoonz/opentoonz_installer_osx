@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
-
 if ARGV.size != 5 then
   puts "usage: ./app.rb [SRC_BUNDLE_PATH] [STUFF_DIR] [VERSION(float)] [MACDEPLOYQT_PATH] [DELETE_RPATH]"
   exit 1
@@ -59,6 +58,7 @@ end
 unless File.exists? "scripts"
     exec_with_assert "cp -r #{THIS_DIRECTORY}/scripts ."
 end
+FileUtils.copy("#{THIS_DIRECTORY}/License.rtf", "License.rtf")
 # 既存のものを削除し tar で固めて scripts に設置
 if File.exist? "scripts/stuff.tar.bz2" then
     exec_with_assert "rm scripts/*.tar.bz2"
