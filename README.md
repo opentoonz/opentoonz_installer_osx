@@ -23,13 +23,13 @@
 実際の実行例
 
 ```
-./app.rb ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.0.app ~/Workspaces/github/kogaki/toonz/opentoonz/stuff 0.0.1 ~/Qt5.5.1/5.5/clang_64/bin/macdeployqt ~/Qt5.5.1/5.5/clang_64/lib
+./app.rb ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.1.app ~/Workspaces/github/kogaki/toonz/opentoonz/stuff 0.0.1 ~/Qt5.5.1/5.5/clang_64/bin/macdeployqt ~/Qt5.5.1/5.5/clang_64/lib
 ```
 
 ### rpath の確認
 
 ```
-otool -l ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.0.app/Contents/MacOS/OpenToonz_1.0
+otool -l ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.1.app/Contents/MacOS/OpenToonz_1.1
 ```
 
 すると、

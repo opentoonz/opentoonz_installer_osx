@@ -21,7 +21,7 @@ VERSION = ARGV[2]
 MACDEPLOYQT_PATH = ARGV[3]
 DELETE_RPATH = ARGV[4]
 VIRTUAL_ROOT = "VirtualRoot"
-INSTALL_BUNDLE = "OpenToonz_1.0.app"
+INSTALL_BUNDLE = "OpenToonz_1.1.app"
 APP = "Applications"
 THIS_DIRECTORY = File.dirname(__FILE__)
 
@@ -44,7 +44,7 @@ exec_with_assert "mv #{INSTALL_BUNDLE} #{VIRTUAL_ROOT}/#{APP}"
 
 # LC_RPATH から自分の名前を削除
 # 削除する RPATH を指定
-DELETE_RPATH_TARGET = "#{VIRTUAL_ROOT}/#{APP}/#{INSTALL_BUNDLE}/Contents/MacOS/OpenToonz_1.0"
+DELETE_RPATH_TARGET = "#{VIRTUAL_ROOT}/#{APP}/#{INSTALL_BUNDLE}/Contents/MacOS/OpenToonz_1.1"
 exec_with_assert "install_name_tool -delete_rpath #{DELETE_RPATH} #{DELETE_RPATH_TARGET}"
 
 # plist が存在しない場合は生成し、必要な変更を適用
@@ -59,7 +59,15 @@ end
 unless File.exists? "scripts"
     exec_with_assert "cp -r #{THIS_DIRECTORY}/scripts ."
 end
-# FileUtils.copy("#{THIS_DIRECTORY}/License.rtf", "License.rtf")
+
+# ライセンス
+unless File.exists? "Japanese.lproj"
+    FileUtils.cp_r("#{THIS_DIRECTORY}/Japanese.lproj", ".")
+end
+unless File.exists? "English.lproj"
+    FileUtils.cp_r("#{THIS_DIRECTORY}/English.lproj", ".")
+end
+
 # 既存のものを削除し tar で固めて scripts に設置
 if File.exist? "scripts/stuff.tar.bz2" then
     exec_with_assert "rm scripts/*.tar.bz2"
