@@ -23,13 +23,13 @@
 実際の実行例
 
 ```
-./app.rb ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.1.app ~/Workspaces/github/kogaki/toonz/opentoonz/stuff 0.0.1 ~/Qt5.5.1/5.5/clang_64/bin/macdeployqt ~/Qt5.5.1/5.5/clang_64/lib
+./app.rb ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.2.app ~/Workspaces/github/kogaki/toonz/opentoonz/stuff 0.0.1 ~/Qt5.9.2/5.9.2/clang_64/bin/macdeployqt ~/Qt5.9.2/5.9.2/clang_64/lib
 ```
 
 ### rpath の確認
 
 ```
-otool -l ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.1.app/Contents/MacOS/OpenToonz_1.1
+otool -l ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_1.2.app/Contents/MacOS/OpenToonz_1.2
 ```
 
 すると、
@@ -38,7 +38,7 @@ otool -l ~/Workspaces/github/kogaki/toonz/opentoonz/toonz/build/toonz/OpenToonz_
 Load command 43
           cmd LC_RPATH
       cmdsize 56
-         path /Users/keisuke_ogaki/Qt/5.5/clang_64/lib/ (offset 12)
+         path /Users/keisuke_ogaki/Qt/5.9.2/clang_64/lib/ (offset 12)
 ```
 
 のように表示されるので、ユーザーに依存してる部分を消しましょう
