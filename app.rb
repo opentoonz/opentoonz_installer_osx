@@ -21,7 +21,7 @@ VERSION = ARGV[2]
 MACDEPLOYQT_PATH = ARGV[3]
 DELETE_RPATH = ARGV[4]
 VIRTUAL_ROOT = "VirtualRoot"
-INSTALL_BUNDLE = "OpenToonz_1.1.app"
+INSTALL_BUNDLE = "OpenToonz_1.2.app"
 APP = "Applications"
 THIS_DIRECTORY = File.dirname(__FILE__)
 
@@ -44,7 +44,7 @@ exec_with_assert "mv #{INSTALL_BUNDLE} #{VIRTUAL_ROOT}/#{APP}"
 
 # LC_RPATH から自分の名前を削除
 # 削除する RPATH を指定
-DELETE_RPATH_TARGET = "#{VIRTUAL_ROOT}/#{APP}/#{INSTALL_BUNDLE}/Contents/MacOS/OpenToonz_1.1"
+DELETE_RPATH_TARGET = "#{VIRTUAL_ROOT}/#{APP}/#{INSTALL_BUNDLE}/Contents/MacOS/OpenToonz_1.2"
 exec_with_assert "install_name_tool -delete_rpath #{DELETE_RPATH} #{DELETE_RPATH_TARGET}"
 
 # plist が存在しない場合は生成し、必要な変更を適用
