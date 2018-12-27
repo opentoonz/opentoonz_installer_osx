@@ -1,5 +1,5 @@
 #!/bin/sh
-STUFF_DIR="OpenToonz_1.2_stuff"
+STUFF_DIR="OpenToonz_stuff"
 tar xzvf stuff.tar.bz2
 mv stuff $STUFF_DIR
 mkdir /Applications/OpenToonz
