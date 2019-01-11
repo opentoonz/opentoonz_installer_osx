@@ -25,7 +25,7 @@ INSTALL_BUNDLE = "OpenToonz.app"
 APP = "Applications"
 THIS_DIRECTORY = File.dirname(__FILE__)
 
-PKG_ID = "io.github.opentoonz.OpenToonz"
+PKG_ID = "io.github.opentoonz"
 PKG_TMP = "OpenToonzBuild.pkg"
 FINAL_PKG = "OpenToonz.pkg"
 
