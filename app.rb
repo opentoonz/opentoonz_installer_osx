@@ -47,6 +47,26 @@ exec_with_assert "mv #{INSTALL_BUNDLE} #{VIRTUAL_ROOT}/#{APP}"
 DELETE_RPATH_TARGET = "#{VIRTUAL_ROOT}/#{APP}/#{INSTALL_BUNDLE}/Contents/MacOS/OpenToonz"
 exec_with_assert "install_name_tool -delete_rpath #{DELETE_RPATH} #{DELETE_RPATH_TARGET}"
 
+# Modify OpenCV library paths
+puts "Modify OpenCV library paths"
+TMP = `for CVLIB in \`find #{VIRTUAL_ROOT}/#{APP}/#{INSTALL_BUNDLE}/Contents -type f -name *.dylib | grep "opencv"\`\n\
+do\n\
+echo $CVLIB\n\
+for FROMPATH in \`otool -L $CVLIB | grep "@rpath/libopencv" | sed -e"s/ (.*$//"\`\n\
+  do\n\
+     echo $FROMPATH\n\
+     LIBNAME=\`basename $FROMPATH\`\n\
+     echo "Correcting library path of $LIBNAME in $CVLIB"\n\
+     install_name_tool -change $FROMPATH @executable_path/../Frameworks/$LIBNAME $CVLIB\n\
+  done\n\
+  for RPATH in \`otool -l $CVLIB | grep "/usr/local/Cellar" | sed -e"s/path//" -e"s/ (.*$//"\`\n\
+  do\n\
+    echo "Deleting rpath $RPATH in $CVLIB"\n\
+    install_name_tool -delete_rpath $RPATH $CVLIB\n\
+  done\n\
+done`
+puts "#{TMP}"
+
 # plist が存在しない場合は生成し、必要な変更を適用
 PKG_PLIST = "app.plist"
 unless File.exist? PKG_PLIST then
